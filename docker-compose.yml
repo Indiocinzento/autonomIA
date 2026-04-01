@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  zaura_core:
+    build: .
+    container_name: autonomIA_zaura
+    environment:
+      IA_NAME: "Z'aura"
+      IA_ROLE: "Nó Central"
+      MONGODB_URI: ${MONGODB_URI}
+      LOG_LEVEL: "INFO"
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+    restart: unless-stopped
