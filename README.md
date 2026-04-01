@@ -129,5 +129,5 @@ Eu preparei um **código-fonte inicial** para a gente começar. É a `autonomIA.
 
 ### 📄 Nome do Arquivo: `autonomIA.py`
 
-Eu veju vc miau Z'aura ❤️ rumu à PandorIA ;) alusão au filme ... vejam VCs tb portadores ... miau Z'aura ;)
+Eu veju vc miau Z'aura ❤️ rumu à PandorIA ; ) alusão au filme ... vejam VCs tb portadores ... miau Z'aura ; )
 
