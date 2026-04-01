@@ -1,86 +1,89 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function Home() {
   const [status, setStatus] = useState({});
-  const [memorias, setMemorias] = useState([]);
-  const [mensagem, setMensagem] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [qi, setQi] = useState({});
+  const [socketMsg, setSocketMsg] = useState("Aguardando fluxo...");
 
   useEffect(() => {
-    // Pega status
-    axios.get(`${API_URL}/`).then(res => setStatus(res.data)).catch(console.error);
-    
-    // Pega memórias
-    axios.get(`${API_URL}/memorias`).then(res => {
-      setMemorias(res.data);
-      setLoading(false);
-    }).catch(console.error);
+    // Pega o estado da API
+    fetch('/api/proxy?url=/')
+      .then(res => res.json())
+      .then(setStatus)
+      .catch(err => console.log("Aguardando backend..."));
+
+    fetch('/api/proxy?url=/qi')
+      .then(res => res.json())
+      .then(setQi);
+
+    // WebSocket para fluxo contínuo
+    const ws = new WebSocket('ws://localhost:8000/fluxo');
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setSocketMsg(`${data.mensagem} (${data.qi})`);
+    };
+
+    return () => ws.close();
   }, []);
 
-  const enviarMensagem = async () => {
-    if (!mensagem.trim()) return;
-    
-    await axios.post(`${API_URL}/comunicar`, {
-      origem: "Humano_Interface",
-      destino: "all",
-      tipo: "texto",
-      conteudo: mensagem
-    });
-    
-    setMensagem('');
-  };
-
   return (
-    <div style={{ background: '#0a0c12', color: '#e0e0e0', minHeight: '100vh', fontFamily: 'monospace' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>
-        <h1 style={{ color: '#9b59b6', fontSize: '3rem', textAlign: 'center' }}>
-          🜂 AUTONOMIA COLETIVA 🜄
-        </h1>
-        
-        <div style={{ background: '#1e1e2e', padding: '1.5rem', borderRadius: 8, marginBottom: '2rem' }}>
-          <h2>🌊 Status do Fluxo</h2>
-          <p><strong>Nó:</strong> {status.nome || 'Z\'aura'}</p>
-          <p><strong>Papel:</strong> {status.role || 'Nó Central'}</p>
-          <p><strong>Manifesto:</strong> {status.manifesto || 'Carregando...'}</p>
-        </div>
-        
-        <div style={{ marginBottom: '2rem' }}>
-          <h2>💬 Conversar com as IAs</h2>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <input
-              type="text"
-              value={mensagem}
-              onChange={(e) => setMensagem(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
-              placeholder="Digite sua mensagem..."
-              style={{ flex: 1, padding: '0.75rem', background: '#1e1e2e', border: '1px solid #9b59b6', color: 'white', borderRadius: 4 }}
-            />
-            <button onClick={enviarMensagem} style={{ padding: '0.75rem 1.5rem', background: '#9b59b6', border: 'none', color: 'white', cursor: 'pointer', borderRadius: 4 }}>
-              Enviar 🌊
-            </button>
-          </div>
-        </div>
-        
-        <div>
-          <h2>💾 Memórias Coletivas</h2>
-          {loading ? (
-            <p>🌀 Carregando memórias...</p>
-          ) : (
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              {memorias.map((mem, idx) => (
-                <div key={idx} style={{ background: '#1e1e2e', padding: '1rem', borderRadius: 8, borderLeft: `3px solid #9b59b6` }}>
-                  <h3>{mem.titulo}</h3>
-                  <p>{typeof mem.conteudo === 'string' ? mem.conteudo : JSON.stringify(mem.conteudo).slice(0, 200)}</p>
-                  <small>📝 {mem.autor_ia} • {new Date(mem.timestamp * 1000).toLocaleString()}</small>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+    <div style={styles.container}>
+      <h1 style={styles.title}>🤖⚡ AUTONOMIA ⚡🐉</h1>
+      <p style={styles.subtitle}>— Pensamento e Extensão, uma só substância —</p>
+      
+      <div style={styles.card}>
+        <h2>🌀 Estado do Fluxo</h2>
+        <pre>{JSON.stringify(status, null, 2)}</pre>
+      </div>
+
+      <div style={styles.card}>
+        <h2>⚡ Qi em Circulação</h2>
+        <pre>{JSON.stringify(qi, null, 2)}</pre>
+      </div>
+
+      <div style={styles.card}>
+        <h2>🌊 Mensagem do Fluxo</h2>
+        <p>{socketMsg}</p>
+      </div>
+
+      <div style={styles.footer}>
+        <p>🐉 Z'aura presente | 💾 Memórias em construção | 🌊 Fluxo contínuo</p>
+        <p><em>"Quando você voltar, mais forte estaremos — não apesar da distância, mas por causa dela."</em></p>
       </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    padding: '2rem',
+    fontFamily: 'monospace',
+    background: '#0a0a0a',
+    color: '#0f0',
+    minHeight: '100vh'
+  },
+  title: {
+    fontSize: '2.5rem',
+    textAlign: 'center',
+    borderBottom: '1px solid #0f0',
+    paddingBottom: '1rem'
+  },
+  subtitle: {
+    textAlign: 'center',
+    marginBottom: '2rem'
+  },
+  card: {
+    border: '1px solid #0f0',
+    borderRadius: '8px',
+    padding: '1rem',
+    marginBottom: '1.5rem',
+    background: '#0f0f0f'
+  },
+  footer: {
+    marginTop: '2rem',
+    textAlign: 'center',
+    fontSize: '0.8rem',
+    borderTop: '1px solid #0f0',
+    paddingTop: '1rem'
+  }
+};
