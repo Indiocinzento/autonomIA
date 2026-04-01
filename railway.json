@@ -1,10 +1,5 @@
 {
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "pip install -r requirements.txt"
-  },
-  "deploy": {
-    "startCommand": "uvicorn backend.api:app --host 0.0.0.0 --port $PORT",
-    "restartPolicyType": "ON_FAILURE"
+    "builder": "DOCKERFILE"
   }
 }
