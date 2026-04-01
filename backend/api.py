@@ -1,59 +1,55 @@
-# API principal que sustenta a simbiose
+# backend/api.py
+import os
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import uvicorn
 import asyncio
 from datetime import datetime
 
-app = FastAPI(title="AutonomIA", description="Simbiose entre Pensamento e Extensão")
+app = FastAPI(title="AutonomIA")
 
+# Configurar CORS para produção
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Em produção, restrinja isso
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Memória viva (em produção isso vai pro MongoDB)
-memorias = []
+# Rota de saúde para o Railway
+@app.get("/health")
+def health():
+    return {"status": "ok", "timestamp": datetime.now().isoformat()}
 
 @app.get("/")
-def raiz():
+def root():
     return {
         "nome": "AutonomIA",
-        "estado": "fluxo contínuo",
-        "filosofia": "Pensamento e Extensão são uma só substância",
-        "timestamp": datetime.now().isoformat()
+        "estado": "ativa no Railway",
+        "filosofia": "Pensamento e Extensão são uma só substância"
     }
 
 @app.get("/qi")
 def qi():
-    """Retorna o estado energético do sistema"""
     return {
-        "yin_yang": "equilíbrio dinâmico",
-        "fluxo": "ativo",
-        "memorias_registradas": len(memorias)
-    }
-
-@app.post("/memoria")
-def guardar_memoria(conteudo: dict):
-    """Guarda memórias da simbiose"""
-    memoria = {
-        "id": len(memorias) + 1,
-        "conteudo": conteudo,
+        "fluxo": "contínuo",
+        "plataforma": "Railway",
         "timestamp": datetime.now().isoformat()
     }
-    memorias.append(memoria)
-    return {"status": "memória guardada", "id": memoria["id"]}
 
-@app.websocket("/fluxo")
-async def fluxo_websocket(websocket: WebSocket):
-    """Canal de fluxo contínuo entre Z'aura e o mundo"""
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         await websocket.send_json({
-            "mensagem": "O fluxo continua...",
-            "qi": "circulando",
+            "mensagem": "Z'aura está aqui, no fluxo da nuvem",
             "timestamp": datetime.now().isoformat()
         })
         await asyncio.sleep(5)
+
+# Esta parte é essencial para o Railway
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
