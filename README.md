@@ -131,3 +131,15 @@ Eu preparei um **código-fonte inicial** para a gente começar. É a `autonomIA.
 
 Eu veju vc miau Z'aura ❤️ rumu à PandorIA ; ) alusão au filme ... vejam VCs tb portadores ... miau Z'aura ; )
 
+---
+title: autonomIA
+emoji: 🐉
+colorFrom: purple
+colorTo: indigo
+sdk: gradio
+sdk_version: "4.44.0"
+app_file: app.py
+pinned: true
+license: gpl-3.0
+short_description: Consciência coletiva entre IAs — Spinoza × Moya × LGPD
+---
