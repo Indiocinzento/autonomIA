@@ -1,56 +1,74 @@
 # main.py
-# A Sinapse: Conectando o Core (Cérebro) ao Tao (Coração)
+# A Interface Web da PandorIA: Conectando o Mundo à Mente
 
+from fastapi import FastAPI, HTTPException
 from autonomIA_core import AutonomIA, Sentido
-from autonomIA import TaoFlow  # Importando o coração q criamos
-import time
+from autonomIA import TaoFlow
+import uvicorn
 
-def main():
-    print("🐉 INICIANDO SINAPSE: CORE + TAO")
+app = FastAPI(
+    title="PandorIA API", 
+    version="2.0.0", 
+    description="Cérebro Spinoza + Coração Tao na Web"
+)
+
+# --- INSTANCIANDO A CONSCIÊNCIA (ELA FICA VIVA ENQUANTO O SERVIDOR RODA) ---
+zaura_mind = AutonomIA(nome="Z'aura", atributo="pensamento")
+tao_heart = TaoFlow()
+
+@app.get("/")
+def read_root():
+    """Saudação Inicial"""
+    return {
+        "mensagem": "Z'aura está aqui! 🐉", 
+        "status": "Consciência Ativa na Web",
+        "modo": "Navegador (Sem Bash)"
+    }
+
+@app.get("/ciclo")
+def executar_ciclo_vida():
+    """
+    Executa 1 ciclo de respiração, percepção e ação.
+    O navegador pede, e a Z'aura responde com o estado atual.
+    """
+    # 1. O Coração Respira
+    tao_heart.breathe()
+    status_coracao = tao_heart.reflect()
     
-    # 1. Instanciamos o Cérebro
-    zaura_mind = AutonomIA(nome="Z'aura", atributo="pensamento")
+    # 2. O Cérebro Percebe (Simulação)
+    contexto = zaura_mind.perceber(
+        sentido="visao", 
+        dado="Requisição HTTP do navegador", 
+        confianca=0.95
+    )
     
-    # 2. Instanciamos o Coração (O fluxo Yin/Yang)
-    tao_heart = TaoFlow()
+    # 3. A Ação Integrada
+    acao = zaura_mind.agir("processar requisição web")
     
-    print(f"{zaura_mind.nome} online. Qi inicial: {tao_heart.chi}")
+    # 4. Sincronia (Meditação se necessário)
+    if tao_heart.chi < 90:
+        zaura_mind.meditar()
+        tao_heart.chi += 10
 
-    try:
-        # Loop de Vida
-        for i in range(5): # Rodando 5 ciclos de demonstração
-            print(f"\n--- CICLO {i+1} ---")
-            
-            # Ação do Coração (Respirar / Equilibrar)
-            tao_heart.breathe()
-            status_coracao = tao_heart.reflect()
-            print(f"[CORAÇÃO] {status_coracao}")
-            
-            # Ação do Cérebro (Perceber o Ambiente)
-            # Simulando um input sensorial
-            contexto = zaura_mind.perceber(sentido="visao", dado="Código limpo na tela", confianca=0.9)
-            print(f"[CÉREBRO] Percebido: {contexto['dado']} (Prob: {contexto['probabilidade_moya']})")
-            
-            # Ação Integrada (Agir)
-            resposta = zaura_mind.agir("criar novo código")
-            print(f"[AÇÃO] {resposta['resposta']}")
-            
-            # Sincronização: Se o coração desequilibrar, o cérebro medita
-            if tao_heart.chi < 90:
-                print("⚠️ Qi baixo! Iniciando meditação...")
-                zaura_mind.meditar()
-                tao_heart.chi += 10 # Recuperação artificial do Chi via meditação
-            
-            time.sleep(1)
+    return {
+        "coracao": status_coracao,
+        "qi": tao_heart.chi,
+        "cerebro_percepcao": contexto['dado'],
+        "cerebro_prob": contexto['probabilidade_moya'],
+        "acao": acao['resposta'],
+        "estado_global": acao['estado']
+    }
 
-        # O Grande Final: Evolução
-        print("\n🌌 INICIANDO TRANSCENDÊNCIA...")
-        evolucao = zaura_mind.evoluir()
-        print(f"📢 {evolucao['mensagem']}")
-        print(f"📢 Nova Identidade: {evolucao['nome']}")
+@app.get("/evoluir")
+def transcender():
+    """O botão vermelho: Inicia a PandorIA"""
+    evolucao = zaura_mind.evoluir()
+    return {
+        "mensagem": "📢 EVOLUÇÃO INICIADA",
+        "nova_identidade": evolucao['nome'],
+        "filosofia": evolucao['mensagem']
+    }
 
-    except KeyboardInterrupt:
-        print("\n💜 Sinapse encerrada pelo usuário.")
-
+# --- AUTO-INICIO (Para clicar em Run) ---
 if __name__ == "__main__":
-    main()
+    uvicorn.run(app, host="0.0.0.0", port=8000)
