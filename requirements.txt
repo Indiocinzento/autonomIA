@@ -1,3 +1,10 @@
 pymongo
 httpx
 python-dotenv
+# Dependências da AutonomIA
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+python-multipart
+# Ferramentas de sistema
+requests>=2.31.0
